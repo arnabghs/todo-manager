@@ -215,8 +215,16 @@ const parseSignUpData = function (req) {
 	};
 };
 
+const createPrivateDir = function () {
+	if (!fs.existsSync('./private_data')) {
+		fs.mkdirSync('./private_data');
+	}
+}
+
 const registerNewUser = function (req, res) {
 	const { name, USERID, PASSWORD, confirmPassword } = parseSignUpData(req);
+	createPrivateDir();
+
 	let filePath = `./private_data/${USERID}.json`;
 
 	if (fs.existsSync(filePath)) {
