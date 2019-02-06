@@ -217,7 +217,6 @@ const parseSignUpData = function (req) {
 
 const registerNewUser = function (req, res) {
 	const { name, USERID, PASSWORD, confirmPassword } = parseSignUpData(req);
-	const parsedData = parseSignUpData(req);
 	let filePath = `./private_data/${USERID}.json`;
 
 	if (fs.existsSync(filePath)) {
