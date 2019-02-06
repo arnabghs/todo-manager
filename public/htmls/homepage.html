@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>User Dashboard</title>
+    <script src="../scripts/homepage.js"></script>
+    <link rel="stylesheet" href="/stylesheets/homepage.css" />
+  </head>
+  <body>
+    <main class="hp-main">
+      <header class="hp-header">
+        <p>Hello ___userId___!</p>
+        <form
+          class="hp-logout-form"
+          id="logout-button"
+          action="/logout"
+          method="POST"
+        >
+          <button type="submit">Logout</button>
+        </form>
+      </header>
+
+      <section class="hp-section">
+        <div class="addtodo-section">
+          <div class="addtodo">
+            <label>Todo Title : </label>
+            <input type="text" name="listTitle" id="todoTitleBox" required />
+          </div>
+          <div class="adddescription">
+            <label> Description : </label>
+            <input
+              type="text"
+              name="listDescription"
+              id="todoDescriptionBox"
+              size="60"
+            />
+          </div>
+          <button onclick="addList()">Add</button>
+        </div>
+        <div class="dashboard">
+          <div class="list-area" id="listArea"></div>
+          <div class="item-area" id="itemArea"></div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

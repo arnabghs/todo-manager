@@ -1,0 +1,4 @@
+* Fix Issues
+  * On authentication error take proper action
+  * filename should be in same in case
+  * setStatus should be changed to toggleStatus

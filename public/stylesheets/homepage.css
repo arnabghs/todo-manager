@@ -1,0 +1,272 @@
+.hp-main {
+  height: 98%;
+  width: 99%;
+  position: absolute;
+}
+
+.hp-header {
+  height: 70px;
+  font-size: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  border-bottom: 1px solid black;
+}
+
+.hp-logout-form button {
+  position: fixed;
+  right: 20px;
+  top: 10px;
+  width: 90px;
+  height: 30px;
+  font-size: 15px;
+  border-radius: 20px;
+}
+
+.hp-logout-form button:focus {
+  font-size: 18px;
+  outline: none;
+  background-color: skyblue;
+}
+
+.hp-logout-form button:hover {
+  font-size: 18px;
+  outline: none;
+  background-color: skyblue;
+}
+
+.hp-section {
+  width: 100%;
+  height: 88%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.addtodo-section {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid black;
+}
+
+.addtodo-section label {
+  font-size: 15px;
+}
+
+.addtodo {
+  width: 30%;
+}
+
+.addtodo input {
+  height: 24px;
+  width: 60%;
+  font-size: 15px;
+}
+
+.adddescription {
+  width: 60%;
+}
+
+.adddescription input {
+  height: 24px;
+  width: 80%;
+  font-size: 15px;
+}
+
+.addtodo-section button {
+  width: 90px;
+  height: 30px;
+  font-size: 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.addtodo-section button:focus {
+  font-size: 18px;
+  outline: none;
+  background-color: skyblue;
+}
+
+.addtodo-section button:hover {
+  font-size: 18px;
+  outline: none;
+  background-color: skyblue;
+}
+
+.addtodo-section input::placeholder {
+  color: red;
+}
+
+.dashboard {
+  width: 100%;
+  height: 85%;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.list-area {
+  width: 20%;
+  height: 95%;
+  font-size: 25px;
+  box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.47);
+  text-align: center;
+  overflow: scroll;
+  cursor: pointer;
+}
+
+.list-area div {
+  padding: 5px;
+  border-bottom: solid 2px rgba(157, 157, 157, 0.919);
+}
+
+.list-area div:hover {
+  font-weight: bold;
+}
+
+.item-area {
+  width: 75%;
+  height: 95%;
+  box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.47);
+  overflow: scroll;
+  position: relative;
+}
+
+.item-area p:hover {
+  font-weight: bold;
+}
+
+.item-area p:focus {
+  font-weight: bold;
+  outline: none;
+}
+
+.item-area-head {
+  text-align: center;
+}
+
+#todoTitle {
+  font-size: 40px;
+  cursor: pointer;
+}
+
+#todoDescription {
+  font-size: 30px;
+}
+
+.additem-div {
+  display: flex;
+  justify-content: space-between;
+  width: 70%;
+  margin-left: 1.5%;
+}
+
+.additem-div input {
+  width: 80%;
+  font-size: 15px;
+}
+
+.additem-div button {
+  width: 70px;
+  height: 30px;
+  font-size: 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.additem-div button:hover {
+  font-size: 18px;
+  outline: none;
+  background-color: skyblue;
+}
+
+.additem-div button:focus {
+  font-size: 18px;
+  outline: none;
+  background-color: skyblue;
+}
+
+.additem-div input::placeholder {
+  color: red;
+}
+
+.task-div {
+  width: 70%;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 1.5%;
+}
+
+.checkBoxes {
+  width: 25px;
+  height: 25px;
+}
+
+.task-desc {
+  font-size: 25px;
+}
+
+.task-div button {
+  width: 70px;
+  height: 30px;
+  font-size: 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.task-div button:hover {
+  width: 71px;
+  font-size: 18px;
+  background-color: rgb(255, 68, 68);
+}
+
+.task-div button:focus {
+  width: 71px;
+  font-size: 18px;
+  background-color: rgb(255, 68, 68);
+}
+
+.item-area-bottom {
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: fixed;
+  right: 3%;
+  bottom: 8%;
+}
+
+.item-area-bottom button {
+  width: 130px;
+  height: 30px;
+  font-size: 15px;
+  border-radius: 20px;
+  margin-left: 15px;
+  cursor: pointer;
+}
+
+#savetodo-button:hover {
+  font-size: 18px;
+  outline: none;
+  background-color: rgb(120, 204, 120);
+}
+
+#savetodo-button:focus {
+  font-size: 18px;
+  outline: none;
+  background-color: rgb(120, 204, 120);
+}
+
+#deletetodo-button:hover {
+  font-size: 18px;
+  outline: none;
+  background-color: rgb(255, 68, 68);
+}
+
+#deletetodo-button:focus {
+  font-size: 18px;
+  outline: none;
+  background-color: rgb(255, 68, 68);
+}
