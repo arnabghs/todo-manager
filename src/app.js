@@ -8,23 +8,14 @@ const { Todo } = require("./model/todo.js");
 const { Item } = require("./model/item.js");
 const { User } = require("./model/user.js");
 
+const cookieParser = require('cookie-parser');
+
 let session = new Object();
 
 //-------------------------Server Handlers-------------------------//
-
-const send = function (res, content, statusCode = 200) {
-	res.statusCode = statusCode;
-	res.write(content);
-	res.end();
-};
-
 const getUserData = function (req, res) {
-	const userId = retrieveUserId(req);
-	send(res, JSON.stringify(session[userId]), 200);
-};
-
-const retrieveUserId = function (req) {
-	return req.headers.cookie.split("=")[1];
+	const { username } = req.cookies;
+	res.send(JSON.stringify(session[username]));
 };
 
 const setCookie = function (req, res) {
@@ -49,9 +40,9 @@ const getRequest = function (url) {
 //-------------------------TODO Handlers-------------------------//
 
 const writeData = function (req, res) {
-	const userId = retrieveUserId(req);
-	const filePath = `./private_data/${userId}.json`;
-	const data = JSON.stringify(session[userId]);
+	const { username } = req.cookies;
+	const filePath = `./private_data/${username}.json`;
+	const data = JSON.stringify(session[username]);
 
 	fs.writeFile(filePath, data, err => {
 		if (err) throw err;
@@ -69,12 +60,12 @@ const logUserOut = function (req, res) {
 
 const deleteItem = function (req, res) {
 	const { itemId, listId } = JSON.parse(req.body);
-	const userId = retrieveUserId(req);
+	const { username } = req.cookies;
 
-	const listIndex = session[userId].todoLists.findIndex(
+	const listIndex = session[username].todoLists.findIndex(
 		list => list.id == listId
 	);
-	session[userId].todoLists[listIndex].deleteItem(itemId);
+	session[username].todoLists[listIndex].deleteItem(itemId);
 	writeData(req, res);
 };
 
@@ -87,12 +78,11 @@ const saveItems = function (req, res) {
 		editedItems
 	} = JSON.parse(req.body);
 
-	const userId = retrieveUserId(req);
-	const listIndex = session[userId].todoLists.findIndex(
+	const { username } = req.cookies;
+	const listIndex = session[username].todoLists.findIndex(
 		list => list.id == listId
 	);
-	const savedItems = session[userId].todoLists[listIndex].items;
-
+	const savedItems = session[username].todoLists[listIndex].items;
 	editedItems.forEach(editedItem => {
 		let editedItemId = editedItem.id.substring(4);
 
@@ -109,43 +99,43 @@ const saveItems = function (req, res) {
 		index++;
 	});
 
-	session[userId].todoLists[listIndex].editTitle(newTitle);
-	session[userId].todoLists[listIndex].editDescription(newDescription);
-	session[userId].todoLists[listIndex].items = savedItems;
+	session[username].todoLists[listIndex].editTitle(newTitle);
+	session[username].todoLists[listIndex].editDescription(newDescription);
+	session[username].todoLists[listIndex].items = savedItems;
 	writeData(req, res);
 };
 
 const addItem = function (req, res) {
 	const { id, desc } = JSON.parse(req.body);
 	let item = { id: 0, description: desc, status: false };
-	const userId = retrieveUserId(req);
+	const { username } = req.cookies;
 
-	const matchedList = session[userId].todoLists.filter(
-		list => list.id == id
-	)[0];
+	const matchedList = session[username].todoLists.filter(list => list.id == id)[0];
 	if (matchedList.items.length > 0) {
 		item.id = matchedList.items[0].id + 1;
 	}
-	let listIndex = session[userId].todoLists.findIndex(item => item.id == id);
+	let listIndex = session[username].todoLists.findIndex(item => item.id == id);
 
 	let newItem = new Item(item);
-	session[userId].todoLists[listIndex].addItem(newItem);
+	session[username].todoLists[listIndex].addItem(newItem);
 	writeData(req, res);
 };
 
 const deleteList = function (req, res) {
 	const todoId = req.body;
-	const userId = retrieveUserId(req);
-	session[userId].deleteTodo(todoId);
+	const { username } = req.cookies;
+
+	session[username].deleteTodo(todoId);
 	writeData(req, res);
 };
 
 const addList = function (req, res) {
 	const { listTitle, listDescription } = JSON.parse(req.body);
-	const userId = retrieveUserId(req);
+	const { username } = req.cookies;
+
 	let listId = 0;
-	if (session[userId].todoLists.length > 0) {
-		listId = session[userId].todoLists[0].id + 1;
+	if (session[username].todoLists.length > 0) {
+		listId = session[username].todoLists[0].id + 1;
 	}
 
 	const todo = {
@@ -156,7 +146,7 @@ const addList = function (req, res) {
 	};
 
 	let list = new Todo(todo);
-	session[userId].addTodo(list);
+	session[username].addTodo(list);
 	writeData(req, res);
 };
 
@@ -274,7 +264,7 @@ const loadHomePage = function (req, res, filePath, USERID, PASSWORD) {
 
 		let userData = JSON.parse(content);
 
-		if (!req.headers.cookie) {
+		if (!req.cookies.username) {
 			if (!passwordMatched(res, PASSWORD, userData.PASSWORD)) return;
 			setCookie(req, res);
 		}
@@ -293,15 +283,16 @@ const loadHomePage = function (req, res, filePath, USERID, PASSWORD) {
 
 const renderMainPage = function (nameOfForm, req, res) {
 	if (req.headers.cookie) {
-		let userId = retrieveUserId(req);
-		const filePath = `./private_data/${userId}.json`;
-		loadHomePage(req, res, filePath, userId);
+		const { username } = req.cookies;
+		const filePath = `./private_data/${username}.json`;
+		loadHomePage(req, res, filePath, username);
 		return;
 	}
 	loadIndexPage(req, res, nameOfForm);
 };
 
 app.use(readBody);
+app.use(cookieParser());
 app.get("/", renderMainPage.bind(null, "loginForm"));
 app.post("/", logUserIn);
 app.get("/signup", renderMainPage.bind(null, "signUpForm"));
