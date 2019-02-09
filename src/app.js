@@ -9,6 +9,8 @@ const { Item } = require("./model/item.js");
 const { User } = require("./model/user.js");
 
 const cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser')
+
 
 let session = new Object();
 
@@ -21,15 +23,6 @@ const getUserData = function (req, res) {
 const setCookie = function (req, res) {
 	const { USERID } = parseLoginData(req);
 	res.setHeader("Set-Cookie", `username=${USERID}`);
-};
-
-const readBody = function (req, res, next) {
-	let content = "";
-	req.on("data", chunk => (content += chunk));
-	req.on("end", () => {
-		req.body = content;
-		next();
-	});
 };
 
 const getRequest = function (url) {
@@ -57,7 +50,7 @@ const logUserOut = function (req, res) {
 };
 
 const deleteItem = function (req, res) {
-	const { itemId, listId } = JSON.parse(req.body);
+	const { itemId, listId } = req.body;
 	const { username } = req.cookies;
 
 	const listIndex = session[username].todoLists.findIndex(
@@ -104,7 +97,7 @@ const saveItems = function (req, res) {
 };
 
 const addItem = function (req, res) {
-	const { id, desc } = JSON.parse(req.body);
+	const { id, desc } = req.body;
 	let item = { id: 0, description: desc, status: false };
 	const { username } = req.cookies;
 
@@ -128,7 +121,7 @@ const deleteList = function (req, res) {
 };
 
 const addList = function (req, res) {
-	const { listTitle, listDescription } = JSON.parse(req.body);
+	const { listTitle, listDescription } = req.body;
 	const { username } = req.cookies;
 
 	let listId = 0;
@@ -180,21 +173,17 @@ const reviveInstances = function (USERID) {
 	}
 };
 
-const parseData = function (content, index) {
-	return content.split("&")[index].split("=")[1];
-};
-
 const parseLoginData = function (req) {
-	const userId = parseData(req.body, 0);
-	const password = parseData(req.body, 1);
+	const userId = req.body.username;
+	const password = req.body.password;
 	return { USERID: userId, PASSWORD: password };
 };
 
 const parseSignUpData = function (req) {
-	const name = parseData(req.body, 0);
-	const userId = parseData(req.body, 1);
-	const password = parseData(req.body, 2);
-	const confirmPassword = parseData(req.body, 3);
+	const name = req.body.name;
+	const userId = req.body.username;
+	const password = req.body.password;
+	const confirmPassword = req.body.confirm_password;
 	return {
 		name: name,
 		USERID: userId,
@@ -289,7 +278,10 @@ const renderMainPage = function (nameOfForm, req, res) {
 	loadIndexPage(req, res, nameOfForm);
 };
 
-app.use(readBody);
+app.use(bodyParser.text())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+
 app.use(cookieParser());
 app.get("/", renderMainPage.bind(null, "loginForm"));
 app.post("/", logUserIn);
@@ -307,7 +299,5 @@ app.use(express.static("public"));
 module.exports = {
 	app,
 	getRequest,
-	parseData,
 	parseLoginData,
-	renderMainPage
 };
