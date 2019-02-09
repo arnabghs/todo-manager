@@ -52,10 +52,8 @@ const writeData = function (req, res) {
 };
 
 const logUserOut = function (req, res) {
-	let expiryDate = "Thu, 01 Jan 1970 00:00:00 UTC;";
-	res.setHeader("Set-Cookie", `username=;expires=${expiryDate};`);
-	res.writeHead(302, { Location: "/" });
-	res.end();
+	res.clearCookie("username");
+	res.redirect("/");
 };
 
 const deleteItem = function (req, res) {
