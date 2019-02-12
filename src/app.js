@@ -20,11 +20,6 @@ const getUserData = function (req, res) {
 	res.send(JSON.stringify(session[username]));
 };
 
-const setCookie = function (req, res) {
-	const { USERID } = parseLoginData(req);
-	res.setHeader("Set-Cookie", `username=${USERID}`);
-};
-
 const getRequest = function (url) {
 	if (url == "/") return INDEXPATH;
 	return "./public" + url;
@@ -226,16 +221,15 @@ const registerNewUser = function (req, res) {
 	fs.writeFile(filePath, JSON.stringify(userDetails), err => {
 		if (err) throw err;
 	});
-	res.writeHead(302, { Location: "/" });
-	res.end();
+	res.redirect("/");
 };
 
 const logUserIn = function (req, res) {
-	const { USERID, PASSWORD } = parseLoginData(req);
+	const { USERID } = parseLoginData(req);
 	const filePath = `./private_data/${USERID}.json`;
 
 	if (!userExist(res, filePath)) return;
-	loadHomePage(req, res, filePath, USERID, PASSWORD);
+	loadHomePage(req, res, filePath);
 };
 
 const loadIndexPage = function (req, res, nameOfForm) {
@@ -245,24 +239,26 @@ const loadIndexPage = function (req, res, nameOfForm) {
 	});
 };
 
-const loadHomePage = function (req, res, filePath, USERID, PASSWORD) {
+const loadHomePage = function (req, res, filePath) {
+	const { USERID, PASSWORD } = parseLoginData(req);
+
 	fs.readFile(filePath, (err, content) => {
 		if (err) throw err;
-
 		let userData = JSON.parse(content);
 
 		if (!req.cookies.username) {
 			if (!passwordMatched(res, PASSWORD, userData.PASSWORD)) return;
-			setCookie(req, res);
+			res.cookie("username", USERID);
 		}
 
-		session[USERID] = userData;
-		reviveInstances(USERID);
+		const { username } = req.cookies;
+		session[username] = userData;
+		reviveInstances(username);
 		const filePath = "./public/htmls/homepage.html";
 
 		fs.readFile(filePath, ENCODING, function (err, content) {
 			if (err) throw err;
-			res.write(content.replace("___userId___", session[USERID].name));
+			res.write(content.replace("___userId___", session[username].name));
 			res.end();
 		});
 	});
@@ -272,7 +268,7 @@ const renderMainPage = function (nameOfForm, req, res) {
 	if (req.headers.cookie) {
 		const { username } = req.cookies;
 		const filePath = `./private_data/${username}.json`;
-		loadHomePage(req, res, filePath, username);
+		loadHomePage(req, res, filePath);
 		return;
 	}
 	loadIndexPage(req, res, nameOfForm);
