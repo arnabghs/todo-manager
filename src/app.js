@@ -225,12 +225,18 @@ const registerNewUser = function (req, res) {
 };
 
 const logUserIn = function (req, res) {
-	const { USERID } = parseLoginData(req);
+	const { USERID, PASSWORD } = parseLoginData(req);
 	const filePath = `./private_data/${USERID}.json`;
 
 	if (!userExist(res, filePath)) return;
-	loadHomePage(req, res, filePath);
-};
+
+	fs.readFile(filePath, (err, content) => {
+		if (err) throw err;
+		let userData = JSON.parse(content);
+		if (!passwordMatched(res, PASSWORD, userData.PASSWORD)) return;
+		loadHomePage(req, res, userData);
+	})
+}
 
 const loadIndexPage = function (req, res, nameOfForm) {
 	fs.readFile(INDEXPATH, ENCODING, function (err, content) {
@@ -239,40 +245,34 @@ const loadIndexPage = function (req, res, nameOfForm) {
 	});
 };
 
-const loadHomePage = function (req, res, filePath) {
-	const { USERID, PASSWORD } = parseLoginData(req);
+const loadHomePage = function (req, res, userData) {
+	if (!req.cookies.username) res.cookie("username", userData.USERID);
 
-	fs.readFile(filePath, (err, content) => {
+	const { username } = req.cookies;
+	session[username] = userData;
+	reviveInstances(username);
+	const filePath = "./public/htmls/homepage.html";
+
+	fs.readFile(filePath, ENCODING, function (err, content) {
 		if (err) throw err;
-		let userData = JSON.parse(content);
-
-		if (!req.cookies.username) {
-			if (!passwordMatched(res, PASSWORD, userData.PASSWORD)) return;
-			res.cookie("username", USERID);
-		}
-
-		const { username } = req.cookies;
-		session[username] = userData;
-		reviveInstances(username);
-		const filePath = "./public/htmls/homepage.html";
-
-		fs.readFile(filePath, ENCODING, function (err, content) {
-			if (err) throw err;
-			res.write(content.replace("___userId___", session[username].name));
-			res.end();
-		});
+		res.write(content.replace("___userId___", session[username].name));
+		res.end();
 	});
 };
 
 const renderMainPage = function (nameOfForm, req, res) {
-	if (req.headers.cookie) {
-		const { username } = req.cookies;
-		const filePath = `./private_data/${username}.json`;
-		loadHomePage(req, res, filePath);
+	if (!req.headers.cookie) {
+		loadIndexPage(req, res, nameOfForm);
 		return;
 	}
-	loadIndexPage(req, res, nameOfForm);
-};
+	const { username } = req.cookies;
+	const filePath = `./private_data/${username}.json`;
+	fs.readFile(filePath, (err, content) => {
+		if (err) throw err;
+		let userData = JSON.parse(content);
+		loadHomePage(req, res, userData);
+	});
+}
 
 app.use(bodyParser.text())
 app.use(bodyParser.urlencoded({ extended: true }))
